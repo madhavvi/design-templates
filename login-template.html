@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Sign In with Auth0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.auth0.com/js/auth0/9.11/auth0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.js">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<style>
+    body,
+    html {
+        height: 100%;
+        background-color: #fff;
+    }
+
+    .login-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        padding: 0 !important;
+    }
+
+    .form-container {
+        padding: 0 40px 40px;
+    }
+
+    .form-control {
+        height: 52px;
+        padding: 5px 12px;
+        font-size: 16px;
+        border-radius: 3px;
+        box-shadow: none;
+        border: 1px solid #c2c8d0;
+    }
+
+    .form-control:focus {
+        border-color: #eb5424;
+        box-shadow: none;
+        border-width: 1.5px;
+    }
+
+    .form-container p {
+        margin: 0 0 20px;
+    }
+
+    .login-box {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 0px;
+        background-color: #fff;
+        border-radius: 5px;
+        border-top: 1px solid #e9e9e9;
+        display: flex;
+        margin: auto;
+        flex-direction: column;
+        white-space: normal;
+        height: auto;
+        float: none;
+        min-width: 400px;
+        max-width: 400px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .login-header {
+        text-align: center;
+        padding: 40px 40px 24px;
+    }
+
+    .login-header h3 {
+        margin-bottom: 20px;
+    }
+
+    .login-header img {
+        height: 90px;
+        width: 90px;
+    }
+
+    #forgot-password {
+        color: #eb5424;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        background: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    #forgot-password {
+        outline: none;
+    }
+
+    hr {
+        margin: 30px 0 20px;
+        border-top: 1px solid #c2c8d0;
+    }
+
+    .btn-block {
+        border-color: transparent;
+        display: block;
+        width: 100%;
+        background-color: #eb5424;
+        border-radius: 3px;
+        height: 50px;
+        font-size: 17px;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary.active {
+        background-color: #eb5424 !important;
+        border-color: #eb5424 !important;
+        outline: none !important;
+    }
+
+    #forgot-password-container,
+    #welcome-panel-1,
+    #footer {
+        display: none;
+    }
+
+    ._social-buttons {
+        width: 100%;
+        padding: 14px 15px;
+        background-color: #fff;
+        border: 1px solid #c2c8d0;
+        border-radius: 3px;
+        text-align: left;
+    }
+
+    .b2b-btn {
+        margin-bottom: 10px;
+    }
+
+    ._social-button-icon {
+        height: 20px;
+        width: 20px;
+    }
+
+    ._social-buttons:hover {
+        background-color: #f1f2f3;
+    }
+
+    ._social-buttons:focus {
+        box-shadow: 0 0 0 4px rgba(10, 132, 174, .14);
+        outline: none;
+    }
+
+    ._social-buttons img {
+        vertical-align: sub;
+        margin: 0 10px 0 3px;
+        width: 20px;
+        height: 20px;
+    }
+
+    ._social-buttons i {
+        vertical-align: bottom;
+        color: #0059d6;
+        margin: 0 10px 0 3px;
+        font-size: 23px;
+    }
+
+    .separator-block {
+        padding: 24px 0;
+    }
+
+    .separator {
+        border-top: 1px solid #c2c8d0;
+        width: 42%;
+        display: inline-block;
+        vertical-align: super;
+    }
+
+    .or {
+        margin: 0 11px !important;
+        display: inline-block;
+        font-size: 12px;
+    }
+
+    #error-message,
+    #success-message {
+        display: none;
+    }
+
+
+    .alert {
+        border-radius: 0 !important;
+    }
+
+    .login-container {
+        animation-duration: 0.25s;
+        transition-timing-function: ease-in;
+        animation-fill-mode: both;
+    }
+
+    #password-show {
+        position: relative;
+        background-position: 50%;
+        background-size: auto;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        pointer-events: auto;
+        height: 30px;
+        width: 40px;
+        float: right;
+        margin-top: -40px;
+    }
+
+    .password-show.active {
+        background-image: url(https://cdn.auth0.com/ulp/react-components/1.12.2/img/theme-generic/show-password.svg);
+    }
+
+    .password-show.inactive {
+        background-image: url(https://cdn.auth0.com/ulp/react-components/1.12.2/img/theme-generic/hide-password.svg);
+    }
+</style>
+
+<body>
+    <div class="login-container">
+        <div class="col-xs-12 col-sm-4 col-sm-offset-4 login-box">
+            <div class="login-header">
+                <img src="auth0-logo.svg" />
+                <div class="login-container" id="welcome-panel">
+                    <h3>Welcome</h3>
+                    <h5>Log in to <span id="app-title"></span></h5>
+                </div>
+                <div class="forgot-password-container" id="welcome-panel-1">
+                    <h3>Forgot Your Password?</h3>
+                    <h5 style="line-height: 1.5;">Please enter your email address and we will email you a link to reset your password.</h5>
+                </div>
+            </div>
+            <div id="error-message" class="alert alert-danger"></div>
+            <div id="success-message" class="alert alert-success"></div>
+            <form onsubmit="return false;" method="post" class="form-container">
+                <div class="login-container" id="login-container">
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="email" placeholder="Email address">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                        <div id="password-show" class="password-show active"></div>
+                    </div>
+                    <button type="button" id="forgot-password">Forgot Password?</button>
+                    <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+                        Continue
+                    </button>
+                    <div class="separator-block">
+                        <span class="separator"></span>
+                        <p class="or">OR</p>
+                        <span class="separator"></span>
+                    </div>
+                    <button type="button" class="_social-buttons b2b-btn" id="B2BSAMLSP">
+                        <img class="idp-icon _social-button-icon"
+                            src="google-logo.png"
+                            alt="Connection icon">
+                            <span class="idp-text"> Continue with Google</span>
+                            <!-- src="https://launch-pad.oncall-test.misp-solutions.com/favicon-michelin_viamichelin_512x512.png" -->
+                    </button>
+                    <button type="button" class="_social-buttons saml-btn" id="B2BSAML2" data-provider="samlp">
+                        <img src="Salesforce-logo1.png" alt="Sales Force">
+                        <span class="idp-text"> Continue with Sales Force</span>
+                        <!-- <img src="https://central.testing.misp-solutions.com/salesforce_icon.png.png" alt="Sales Force"> -->
+                    </button>
+                </div>
+                <div class="forgot-password-container" id="forgot-password-container">
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="email-1" placeholder="Email address">
+                    </div>
+                    <button type="submit" id="submit-forgot-password" class="btn btn-primary btn-block"
+                        style="margin-top: 30px;">
+                        Continue
+                    </button>
+                </div>
+            </form>
+            <div id="footer" class="forgot-password-container">
+                <hr>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <a id="go-to-login" style="text-decoration: none; cursor: pointer; color: #eb5424;">Back to login page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--[if IE 8]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ie8/0.2.5/ie8.js"></script>
+  <![endif]-->
+
+    <!--[if lte IE 9]>
+  <script src="https://cdn.auth0.com/js/polyfills/1.0/base64.min.js"></script>
+  <script src="https://cdn.auth0.com/js/polyfills/1.0/es5-shim.min.js"></script>
+  <![endif]-->
+
+    <script src="https://cdn.auth0.com/js/auth0/9.13/auth0.min.js"></script>
+    <script src="https://cdn.auth0.com/js/polyfills/1.0/object-assign.min.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+
+            var config = JSON.parse(
+                decodeURIComponent(escape(window.atob('@@config@@')))
+            );
+
+            var app_title = (config && config.dict && config.dict.signin && config.dict.signin.title);
+            $("#app-title").text(app_title)
+            
+            var errorMessage = document.getElementById('error-message');
+            var successMessage = document.getElementById('success-message');
+            
+            var params = Object.assign({
+                /* additional configuration needed for use of custom domains
+                overrides: {
+                  __tenant: config.auth0Tenant,
+                  __token_issuer: 'YOUR_CUSTOM_DOMAIN'
+                }, */
+                domain: config.auth0Domain,
+                clientID: config.clientID,
+                redirectUri: config.callbackURL,
+                responseType: 'code'
+            }, config.internalOptions);
+
+            var webAuth = new auth0.WebAuth(params);
+
+            var databaseConnection = 'Username-Password-Authentication';
+
+            function login(e) {
+                e.preventDefault();
+                errorMessage.style.display = 'none';
+                var username = document.getElementById('email').value;
+                var password = document.getElementById('password').value;
+
+                if (!username || !password) {
+                    errorMessage.style.display = 'block';
+                    errorMessage.innerHTML = 'Invalid Email or Password.';
+                    return;
+                }
+                webAuth.login({
+                    realm: databaseConnection,
+                    username: username,
+                    password: password
+                }, function (err) {
+                    if (err) {
+                        displayError(err);
+                        errorMessage.style.display = 'block';
+                        errorMessage.innerHTML = 'Invalid Email or Password.';
+                    };
+                });
+            }
+
+            function togglePassword() {
+                if ($('#password-show').hasClass('active')) {
+                    $('#password-show').removeClass('active');
+                    $('#password-show').addClass('inactive');
+                    $('#password').attr('type', 'text');
+                } else {
+                    $('#password-show').addClass('active');
+                    $('#password-show').removeClass('inactive');
+                    $('#password').attr('type', 'password');
+                }
+            }
+
+            function gotoForgotPassword() {
+                $("#forgot-password-container, #welcome-panel-1, #footer").show();
+                $("#login-container, #welcome-panel, #error-message, #success-message").hide();
+                $("#btn-login").attr('type', 'button');
+            }
+
+            function gotoLogin() {
+                $("#email-1").val('');
+                $("#forgot-password-container, #welcome-panel-1, #footer, #error-message, #success-message").hide();
+                $("#login-container, #welcome-panel").show();
+                $("#btn-login").attr('type', 'submit');
+            }
+
+            function forgetPassword(e) {
+                e.preventDefault();
+                errorMessage.style.display = 'none';
+                var email = document.getElementById('email-1').value;
+                if (!email) {
+                    errorMessage.style.display = 'block';
+                    errorMessage.innerHTML = 'Please enter your email.';
+                    return;
+                }
+
+                webAuth.changePassword({
+                    connection: databaseConnection,
+                    email: email
+                }, function (err, resp) {
+                    if (err) {
+                        displayError(err);
+                    } else {
+                        successMessage.style.display = 'block';
+                        successMessage.innerHTML = resp;
+                    }
+                })
+            }
+
+            function goToB2BSAMLSP() {
+                location.href = 'https://www.google.com';
+                                
+            }
+
+            function goToSalesforce() {
+                location.href = 'https://salesforce.com/';
+            }
+
+            function displayError(err) {
+                errorMessage.style.display = 'block';
+                errorMessage.innerHTML = err.description;
+            }
+
+            document.getElementById('btn-login').addEventListener('click', login);
+            document.getElementById('B2BSAML2').addEventListener('click', goToSalesforce);
+            document.getElementById('go-to-login').addEventListener('click', gotoLogin);
+            document.getElementById('forgot-password').addEventListener('click', gotoForgotPassword);
+            document.getElementById('submit-forgot-password').addEventListener('click', forgetPassword);
+            document.getElementById('password-show').addEventListener('click', togglePassword);
+        });
+    </script>
+</body>
+
+</html>
